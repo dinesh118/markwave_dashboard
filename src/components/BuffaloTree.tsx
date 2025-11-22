@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BuffaloMindmap from './BuffaloMindmap';
 
 function addYears(date: Date, years: number) {
   const d = new Date(date);
@@ -88,9 +89,22 @@ const BuffaloTree: React.FC = () => {
 
   const tree = generateBuffalo(parentName, bornDate, windowStart, windowEnd);
 
+  const [view, setView] = useState<'list' | 'mindmap'>('list');
+
   return (
-    <div style={{ padding: 12, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <BuffaloNode node={tree} level={0} />
+    <div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <button onClick={() => setView('list')} style={{ padding: '6px 10px', borderRadius: 6, background: view === 'list' ? '#2563eb' : '#eef2ff', color: view === 'list' ? '#fff' : '#111' }}>List View</button>
+        <button onClick={() => setView('mindmap')} style={{ padding: '6px 10px', borderRadius: 6, background: view === 'mindmap' ? '#2563eb' : '#eef2ff', color: view === 'mindmap' ? '#fff' : '#111' }}>Mindmap View</button>
+      </div>
+
+      {view === 'list' ? (
+        <div style={{ padding: 12, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+          <BuffaloNode node={tree} level={0} />
+        </div>
+      ) : (
+        <BuffaloMindmap rootNode={tree} />
+      )}
     </div>
   );
 };
