@@ -17,44 +17,99 @@ function convert(node: any) {
 const BuffaloMindmap: React.FC<{ rootNode: any }> = ({ rootNode }) => {
   const treeData = [convert(rootNode)];
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const translate = { x: 50, y: 50 };
+  const translate = { x: 300, y: 100 }; // Better initial positioning
 
   useEffect(() => {
     // nothing for now
   }, []);
 
-  const nodeLabelRenderer = ({ nodeDatum }: any) => {
+  const renderCustomNodeElement = ({ nodeDatum, toggleNode }: any) => {
+    const hasChildren = nodeDatum.attributes?.totalChildren > 0;
+    const nodeColor = hasChildren ? '#10b981' : '#9ca3af'; // Green for parents, grey for childless
+    const textColor = hasChildren ? '#065f46' : '#4b5563';
+    
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', fontSize: 12 }}>
-        <div style={{ fontWeight: 700 }}>{nodeDatum.name}</div>
-        {nodeDatum.attributes && (
-          <div style={{ color: '#6b7280' }}>
-            <div>born: {nodeDatum.attributes.born}</div>
-            <div>milk: {nodeDatum.attributes.milkStarts}</div>
-            <div style={{ color: '#10b981' }}>children: {nodeDatum.attributes.totalChildren}</div>
+      <g>
+        {/* Node circle */}
+        <circle
+          r={25}
+          fill={nodeColor}
+          stroke="#fff"
+          strokeWidth={3}
+          onClick={toggleNode}
+          style={{ cursor: 'pointer' }}
+        />
+        
+        {/* Node label */}
+        <text
+          fill={textColor}
+          strokeWidth="0"
+          x={0}
+          y={5}
+          textAnchor="middle"
+          fontSize="14"
+          fontWeight="600"
+        >
+          {nodeDatum.name}
+        </text>
+        
+        {/* Info box */}
+        <foreignObject
+          x={35}
+          y={-40}
+          width={200}
+          height={80}
+        >
+          <div style={{
+            background: 'white',
+            border: `2px solid ${nodeColor}`,
+            borderRadius: '8px',
+            padding: '8px',
+            fontSize: '11px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ fontWeight: 600, color: textColor, marginBottom: '4px' }}>
+              {nodeDatum.name}
+            </div>
+            {nodeDatum.attributes && (
+              <div style={{ color: '#6b7280', lineHeight: '1.3' }}>
+                <div>born: {nodeDatum.attributes.born}</div>
+                <div>milkStarts: {nodeDatum.attributes.milkStarts}</div>
+                <div style={{ 
+                  color: hasChildren ? '#10b981' : '#ef4444',
+                  fontWeight: 600 
+                }}>
+                  totalChildren: {nodeDatum.attributes.totalChildren}
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </foreignObject>
+      </g>
     );
   };
 
   return (
-    <div style={{ width: '100%', height: '600px', background: '#fff', borderRadius: 8, padding: 8 }} ref={containerRef}>
+    <div style={{ width: '100%', height: '700px', background: '#f8fafc', borderRadius: 12, padding: 16, overflow: 'hidden' }} ref={containerRef}>
       <Tree
         data={treeData}
         translate={translate}
         orientation="vertical"
-        pathFunc="elbow"
+        pathFunc="step"
         collapsible={true}
-        allowForeignObjects
-        nodeLabelComponent={{
-          render: nodeLabelRenderer,
-          foreignObjectWrapper: {
-            y: -20,
-            x: -20,
-          },
+        renderCustomNodeElement={renderCustomNodeElement}
+        separation={{ siblings: 2, nonSiblings: 2.5 }}
+        nodeSize={{ x: 280, y: 150 }}
+        styles={{
+          links: { 
+            stroke: '#64748b', 
+            strokeWidth: 2,
+            fill: 'none'
+          }
         }}
-        styles={{ links: { stroke: '#cbd5e1', strokeWidth: 2 } }}
+        zoomable={true}
+        draggable={true}
+        scaleExtent={{ min: 0.3, max: 2 }}
       />
     </div>
   );
