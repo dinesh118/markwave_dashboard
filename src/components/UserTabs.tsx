@@ -437,32 +437,34 @@ const UserTabs: React.FC = () => {
         )}
       </div>
 
-      {/* Floating + Icon at bottom left */}
-      <button
-        onClick={handleCreateClick}
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          left: '32px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          background: '#2563eb',
-          color: 'white',
-          border: 'none',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}
-        aria-label="Add New Referral"
-      >
-        +
-      </button>
+      {/* Floating + Icon at bottom left - only show on Referral tab */}
+      {activeTab === 'nonVerified' && (
+        <button
+          onClick={handleCreateClick}
+          style={{
+            position: 'fixed',
+            bottom: '32px',
+            left: '32px',
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: '#2563eb',
+            color: 'white',
+            border: 'none',
+            fontSize: '24px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          aria-label="Add New Referral"
+        >
+          +
+        </button>
+      )}
 
       {showModal && (
         <div className="modal">

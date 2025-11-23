@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
-import UsersTab from './components/UsersTab';
-import ReferralsTab from './components/ReferralsTab';
+import React from 'react';
 import HealthStatus from './components/HealthStatus';
-import { Users, UserPlus } from 'lucide-react';
 import UserTabs from './components/UserTabs';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'users' | 'referrals'>('users');
-
   return (
     <div className="App">
       <header className="header">
@@ -20,8 +15,6 @@ function App() {
       </header>
 
       <UserTabs />
-
-      {activeTab === 'users' ? <UsersTab /> : <ReferralsTab />}
     </div>
   );
 }
