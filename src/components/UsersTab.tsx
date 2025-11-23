@@ -125,7 +125,7 @@ const UsersTab: React.FC = () => {
             >
               ×
             </button>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', color: '#2563eb' }}>Add New Customer</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', color: '#2563eb' }}>Add New Referral</h3>
             <form onSubmit={handleCreateUser} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
               {error && <div style={{ color: '#dc2626', background: '#fee2e2', padding: '0.75rem', borderRadius: 8 }}>{error}</div>}
               <input
@@ -146,13 +146,13 @@ const UsersTab: React.FC = () => {
                 style={{ padding: '0.75rem', borderRadius: 8, border: '1px solid #d1d5db', fontSize: '1rem' }}
                 required
               />
-              <button
+              {/* <button
                 type="submit"
                 disabled={creating}
                 style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '0.75rem', fontWeight: 600, fontSize: '1rem', cursor: creating ? 'not-allowed' : 'pointer', opacity: creating ? 0.7 : 1 }}
               >
                 {creating ? 'Adding...' : 'Add User'}
-              </button>
+              </button> */}
             </form>
           </div>
         </>

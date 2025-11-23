@@ -196,9 +196,12 @@ const UserTabs: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/users/', {
-        ...formData,
-        verified: false,
+      const response = await axios.post('http://localhost:8000/users', {
+        mobile: formData.mobile,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        refered_by_mobile: formData.refered_by_mobile,
+        refered_by_name: formData.refered_by_name,
       });
       console.log('User created:', response.data);
       setShowModal(false);
@@ -434,10 +437,37 @@ const UserTabs: React.FC = () => {
         )}
       </div>
 
+      {/* Floating + Icon at bottom left */}
+      <button
+        onClick={handleCreateClick}
+        style={{
+          position: 'fixed',
+          bottom: '32px',
+          left: '32px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          background: '#2563eb',
+          color: 'white',
+          border: 'none',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          boxShadow: '0 4px 16px rgba(37,99,235,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}
+        aria-label="Add New Referral"
+      >
+        +
+      </button>
+
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Create New User</h3>
+            <h3>Add New Referral</h3>
             <form onSubmit={handleSubmit}>
               <label>
                 Mobile:
@@ -473,7 +503,7 @@ const UserTabs: React.FC = () => {
                 />
               </label>
               <label>
-                Referred By Mobile:
+                Referred By(Mobile):
                 <input
                   type="tel"
                   name="refered_by_mobile"
@@ -484,7 +514,7 @@ const UserTabs: React.FC = () => {
                 />
               </label>
               <label>
-                Referred By Name:
+                Referred By(Name):
                 <input
                   type="text"
                   name="refered_by_name"
