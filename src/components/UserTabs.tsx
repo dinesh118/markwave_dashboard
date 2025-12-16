@@ -596,6 +596,7 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile }) => {
                   <tr>
                     <th>Name</th>
                     <th>Mobile</th>
+                    <th>Role</th>
                     <th>Referred By</th>
                     <th>Referrer Mobile</th>
                     <th>Actions</th>
@@ -604,13 +605,26 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile }) => {
                 <tbody>
                   {referralUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', color: '#888' }}>No users found</td>
+                      <td colSpan={6} style={{ textAlign: 'center', color: '#888' }}>No users found</td>
                     </tr>
                   ) : (
                     referralUsers.map((user: any, index: number) => (
                       <tr key={index}>
                         <td>{user.first_name} {user.last_name}</td>
                         <td>{user.mobile}</td>
+                        <td>
+                          <span style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: '#f3f4f6',
+                            fontSize: '11px',
+                            fontWeight: '500',
+                            color: '#374151',
+                            border: '1px solid #e5e7eb'
+                          }}>
+                            {user.role || 'Investor'}
+                          </span>
+                        </td>
                         <td>{user.refered_by_name || '-'}</td>
                         <td>{user.refered_by_mobile || '-'}</td>
                         <td>
@@ -990,6 +1004,16 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile }) => {
                   disabled
                   style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
                   placeholder="Mobile number (cannot be changed)"
+                />
+              </label>
+              <label>
+                Role:
+                <input
+                  type="text"
+                  name="role"
+                  value={editingUser.role || 'Investor'}
+                  disabled
+                  style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
                 />
               </label>
               <label>

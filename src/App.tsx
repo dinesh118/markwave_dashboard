@@ -32,7 +32,7 @@ function App() {
           </div>
           {session && (
             <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.9rem', color: '#e5e7eb' }}>
+              <span style={{ fontSize: '0.9rem', color: '#374151' }}>
                 Logged in as {session.mobile} ({session.role || 'Unknown'})
               </span>
               <button
@@ -42,7 +42,7 @@ function App() {
                   borderRadius: 4,
                   border: '1px solid #9ca3af',
                   background: 'transparent',
-                  color: '#e5e7eb',
+                  color: '#374151',
                   fontSize: '0.85rem',
                   cursor: 'pointer',
                 }}
