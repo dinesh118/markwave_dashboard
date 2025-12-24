@@ -1623,8 +1623,8 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
             )}
 
             {activeTab === 'nonVerified' && (
-              <div>
-                <h2>Referrals</h2>
+              <div style={{ padding: '24px' }}>
+                <h2 style={{ marginBottom: '20px', color: '#1e293b', fontWeight: '700' }}>Referrals</h2>
 
                 <div className="table-container">
                   <table className="user-table">
@@ -1709,8 +1709,8 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
             )}
 
             {activeTab === 'existing' && (
-              <div>
-                <h2>Investors</h2>
+              <div style={{ padding: '24px' }}>
+                <h2 style={{ marginBottom: '20px', color: '#1e293b', fontWeight: '700' }}>Investors</h2>
 
                 <div className="table-container">
                   <table className="user-table">
@@ -1898,42 +1898,55 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
 
         {
           showModal && (
-            <div className="modal" onClick={handleCloseModal}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal" onClick={handleCloseModal} style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '20px'
+            }}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{
+                backgroundColor: 'white',
+                borderRadius: '24px',
+                width: '100%',
+                maxWidth: '480px',
+                padding: '24px 32px',
+                position: 'relative',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                maxHeight: '95vh',
+                overflowY: 'hidden'
+              }}>
                 <button
                   onClick={handleCloseModal}
                   style={{
                     position: 'absolute',
-                    top: '1rem',
-                    right: '1rem',
-                    background: 'none',
+                    top: '16px',
+                    right: '16px',
+                    background: '#f8fafc',
                     border: 'none',
-                    fontSize: '1.5rem',
-                    color: '#9ca3af',
+                    fontSize: '20px',
+                    color: '#64748b',
                     cursor: 'pointer',
-                    width: '2rem',
-                    height: '2rem',
+                    width: '32px',
+                    height: '32px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: '50%',
                     transition: 'all 0.2s ease'
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6';
-                    e.currentTarget.style.color = '#374151';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#9ca3af';
-                  }}
                 >
                   ×
                 </button>
-                <h3>Add New Referral</h3>
-                <form onSubmit={handleSubmit}>
-                  <label>
-                    Role:
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', fontWeight: '700', color: '#1e293b' }}>Add New Referral</h3>
+                <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#64748b' }}>Enter candidate details to create a referral</p>
+
+                <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '16px' }}>
+                  <div style={{ display: 'grid', gap: '6px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Role</label>
                     <select
                       name="role"
                       value={formData.role}
@@ -1941,10 +1954,12 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
                       required
                       style={{
                         width: '100%',
-                        padding: '0.5rem',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '0.375rem',
-                        fontSize: '1rem'
+                        padding: '10px 14px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        fontSize: '14px',
+                        backgroundColor: '#f8fafc',
+                        outline: 'none'
                       }}
                     >
                       <option value="Investor">Investor</option>
@@ -1952,9 +1967,10 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
                       <option value="Supervisor">Supervisor</option>
                       <option value="Employee">Employee</option>
                     </select>
-                  </label>
-                  <label>
-                    Mobile:
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '6px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Mobile</label>
                     <input
                       type="tel"
                       name="mobile"
@@ -1962,32 +1978,63 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
                       onChange={handleInputChange}
                       required
                       placeholder="Enter mobile number"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        fontSize: '14px',
+                        backgroundColor: '#f8fafc',
+                        outline: 'none'
+                      }}
                     />
-                  </label>
-                  <label>
-                    First Name:
-                    <input
-                      type="text"
-                      name="first_name"
-                      value={formData.first_name}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Enter first name"
-                    />
-                  </label>
-                  <label>
-                    Last Name:
-                    <input
-                      type="text"
-                      name="last_name"
-                      value={formData.last_name}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Enter last name"
-                    />
-                  </label>
-                  <label>
-                    Referral(Mobile):
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'grid', gap: '6px' }}>
+                      <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>First Name</label>
+                      <input
+                        type="text"
+                        name="first_name"
+                        value={formData.first_name}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="First name"
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          backgroundColor: '#f8fafc',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gap: '6px' }}>
+                      <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Last Name</label>
+                      <input
+                        type="text"
+                        name="last_name"
+                        value={formData.last_name}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Last name"
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          backgroundColor: '#f8fafc',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '6px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Referral (Mobile)</label>
                     <input
                       type="tel"
                       name="refered_by_mobile"
@@ -1996,10 +2043,20 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
                       onBlur={handleReferralMobileBlur}
                       required={formData.role === 'Investor'}
                       placeholder="Enter referrer's mobile"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        fontSize: '14px',
+                        backgroundColor: '#f8fafc',
+                        outline: 'none'
+                      }}
                     />
-                  </label>
-                  <label>
-                    Referral(Name):
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '6px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Referral (Name)</label>
                     <input
                       type="text"
                       name="refered_by_name"
@@ -2007,10 +2064,54 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
                       onChange={handleInputChange}
                       required={formData.role === 'Investor'}
                       placeholder="Enter referrer's name"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        fontSize: '14px',
+                        backgroundColor: '#f8fafc',
+                        outline: 'none'
+                      }}
                     />
-                  </label>
-                  <button type="submit">Submit</button>
-                  <button type="button" onClick={handleCloseModal}>Cancel</button>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        borderRadius: '10px',
+                        border: '1px solid #e2e8f0',
+                        background: 'white',
+                        color: '#64748b',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                        color: 'white',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(37,99,235,0.2)',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Create Referral
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
