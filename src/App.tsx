@@ -1,3 +1,5 @@
+import { useAppDispatch } from './store/hooks';
+import { setSession as setReduxSession } from './store/slices/authSlice';
 import React, { useState, useCallback, useEffect } from 'react';
 import HealthStatus from './components/HealthStatus';
 import UserTabs from './components/UserTabs';
@@ -11,19 +13,29 @@ interface Session {
   currentLoginTime?: string;
 }
 
+
 function App() {
   const [session, setSession] = useState<Session | null>(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const saved = window.localStorage.getItem('ak_dashboard_session');
     if (saved) {
       try {
-        setSession(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setSession(parsed);
+        dispatch(setReduxSession({
+          adminMobile: parsed.mobile,
+          adminName: parsed.name || 'Admin',
+          adminRole: parsed.role || 'Admin',
+          lastLogin: parsed.lastLoginTime || 'First Login',
+          presentLogin: parsed.currentLoginTime || new Date().toLocaleString(),
+        }));
       } catch (e) {
         window.localStorage.removeItem('ak_dashboard_session');
       }
     }
-  }, []);
+  }, [dispatch]);
 
   const handleLogin = useCallback((s: Session) => {
     // Determine last login (from previous session or current if new)
@@ -47,7 +59,14 @@ function App() {
 
     window.localStorage.setItem('ak_dashboard_session', JSON.stringify(newSession));
     setSession(newSession);
-  }, []);
+    dispatch(setReduxSession({
+      adminMobile: newSession.mobile,
+      adminName: newSession.name || 'Admin',
+      adminRole: newSession.role || 'Admin',
+      lastLogin: newSession.lastLoginTime || 'First Login',
+      presentLogin: newSession.currentLoginTime || new Date().toLocaleString(),
+    }));
+  }, [dispatch]);
 
   const handleLogout = () => {
     window.localStorage.removeItem('ak_dashboard_session');

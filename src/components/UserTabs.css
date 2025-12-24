@@ -44,12 +44,16 @@
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
+    padding-right: 1rem;
     flex-shrink: 0;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
     z-index: 100;
+    border-right:2px solid #a4bdc5;
+    /* border-color: #d5361a; */
+    top: -10px;
   }
 
   .sidebar.closed {
@@ -112,7 +116,7 @@
   .main-content {
     flex: 1;
     overflow-y: auto;
-    padding: 2rem;
+    padding-left: 1rem;
     background-color: var(--bg-color);
     position: relative;
   }
@@ -549,7 +553,7 @@
     .sidebar {
       position: fixed;
       /* Changed to fixed to float over content properly on mobile */
-      top: 0;
+      top: 60px;
       bottom: 0;
       /* Full height */
       left: 0;
@@ -612,7 +616,7 @@
     }
 
     .main-content {
-      padding: 1rem;
+      /* padding: 1rem; */
     }
 
     /* Adjust Status Badge in header if needed */
