@@ -25,12 +25,9 @@ jobs:
           cache: 'npm'
 
       # 3. Install dependencies
-      - name: Install Dependencies (override TypeScript)
-        run: |
-          npm install
-          npm install typescript@4.9.5 --save-dev
-
-
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+ 
       # 4. Build React App
       - name: Build React App
         run: npm run build
