@@ -3,7 +3,7 @@ import './UserTabs.css';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
 import { useTableSortAndSearch } from '../hooks/useTableSortAndSearch';
-import { LayoutDashboard, Users, TreePine, ShoppingBag, LogOut, UserCheck, PanelLeft, PanelLeftClose, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, TreePine, ShoppingBag, LogOut, UserCheck, PanelLeft, PanelLeftClose, Menu, X, ChevronRight, ChevronDown, Briefcase, DollarSign, Package, Settings, MapPin } from 'lucide-react';
 import HealthStatus from './HealthStatus';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import type { RootState } from '../store';
@@ -41,6 +41,7 @@ import NonVerifiedUsersTab from './tabs/NonVerifiedUsersTab';
 import ExistingCustomersTab from './tabs/ExistingCustomersTab';
 import ProductsTab from './tabs/ProductsTab';
 import BuffaloTreeTab from './tabs/BuffaloTreeTab';
+import TrackingTab from './tabs/TrackingTab';
 
 
 interface UserTabsProps {
@@ -465,154 +466,212 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
         onClick={() => dispatch(setSidebarOpen(false))}
       />
 
-      {/* Global Header - Full Width */}
-      <header style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        background: 'var(--bg-color)', /* Match bg */
-        position: 'relative',
-        zIndex: 101, /* Above sidebar */
-        height: '60px' // Check height
-      }}>
-        {/* Mobile Menu Toggle - Visible only on mobile */}
-        {/* Mobile Menu Toggle - Always visible on mobile to toggle state */}
-        <button
-          className="mobile-menu-toggle"
-          onClick={() => dispatch(toggleSidebar())}
-          style={{
-            position: 'absolute',
-            left: '2rem',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#344767',
-            display: 'none' // Hidden by default, shown via CSS on mobile
-          }}
-        >
-          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+      {/* Global Header - Top Full Width */}
+      <header style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Left: Mobile Toggle, Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '50px' }}>
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => dispatch(toggleSidebar())}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'white',
+              display: 'none', // Controlled by CSS
+            }}
+          >
+            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
 
-        {/* Centered Title */}
-        <h6 style={{
-          margin: 0,
-          fontSize: '1.25rem',
-          fontWeight: 700,
-          color: '#344767'
-        }}>
-          Animalkart Dashboard
-        </h6>
+          <img
+            src={require('../logo.svg').default}
+            alt="Markwave Logo"
+            style={{ height: '32px', marginLeft: '50px' }}
+          />
+        </div>
 
-        {/* Right Status - Absolutely positioned */}
+        {/* Center: Title */}
         <div style={{
           position: 'absolute',
-          right: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
           display: 'flex',
+          justifyContent: 'center',
           alignItems: 'center'
         }}>
-          <div style={{ background: 'white', padding: '0.4rem 0.8rem', borderRadius: '20px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-            <HealthStatus />
+          <h6 style={{
+            margin: 0,
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: 'white',
+            whiteSpace: 'nowrap'
+          }}>
+            Animalkart Dashboard
+          </h6>
+        </div>
+
+        {/* Right Status & Profile */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.1)',
+            padding: '6px 16px',
+            borderRadius: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }}></div>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>Online</span>
+          </div>
+
+          {/* Admin Profile in Header (Right of Online) */}
+          <div
+            onClick={() => dispatch(setShowAdminDetails(true))}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginLeft: '24px',
+              cursor: 'pointer'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <span style={{ color: 'white', fontWeight: 600, fontSize: '0.9rem' }}>{adminName}</span>
+            </div>
+            <div className="avatar-circle" style={{ width: '40px', height: '40px', fontSize: '1rem', border: '2px solid rgba(255,255,255,0.2)' }}>
+              {adminName ? adminName.substring(0, 2).toUpperCase() : 'AD'}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Body Layout (Sidebar + Content) */}
+      {/* Main Layout Body (Row: Sidebar + Content) */}
       <div className="layout-body">
         {/* Sidebar */}
-        <nav className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
-          <div className="sidebar-header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: isSidebarOpen ? 'space-between' : 'center', alignItems: 'center', minHeight: '32px' }}>
-            {isSidebarOpen && (
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#344767', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '24px', height: '24px', background: 'linear-gradient(310deg, #2152ff 0%, #21d4fd 100%)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                  <LayoutDashboard size={14} />
-                </div>
-                MarkWave
-              </div>
-            )}
-            <button
-              onClick={() => dispatch(toggleSidebar())}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px', display: 'flex' }}
-            >
-              {isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeft size={20} />}
-            </button>
-          </div>
-
-          <ul className="sidebar-menu">
+        <nav
+          className={`sidebar ${!isSidebarOpen ? 'closed' : ''}`}
+          onClick={() => dispatch(toggleSidebar())}
+        >
+          <ul className="sidebar-menu" style={{ marginTop: '20px' }}>
+            {/* Orders */}
             <li>
               <button
                 className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
-                onClick={() => dispatch(setActiveTab('orders'))}
-                title={!isSidebarOpen ? "Orders" : ""}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('orders'));
+                }}
               >
-                <LayoutDashboard />
-                <span className="nav-text">Orders</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <LayoutDashboard size={18} />
+                  <span className="nav-text">Orders</span>
+                </div>
               </button>
             </li>
+
+            {/* Tracking */}
+            <li>
+              <button
+                className={`nav-item ${activeTab === 'tracking' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('tracking'));
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <MapPin size={18} />
+                  <span className="nav-text">Tracking</span>
+                </div>
+              </button>
+            </li>
+
+            {/* Referrals */}
             <li>
               <button
                 className={`nav-item ${activeTab === 'nonVerified' ? 'active' : ''}`}
-                onClick={() => dispatch(setActiveTab('nonVerified'))}
-                title={!isSidebarOpen ? "Referral" : ""}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('nonVerified'));
+                }}
               >
-                <Users />
-                <span className="nav-text">Referrals</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <Users size={18} />
+                  <span className="nav-text">Referrals</span>
+                </div>
               </button>
             </li>
+
+            {/* Investors */}
             <li>
               <button
                 className={`nav-item ${activeTab === 'existing' ? 'active' : ''}`}
-                onClick={() => dispatch(setActiveTab('existing'))}
-                title={!isSidebarOpen ? "Verified Users" : ""}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('existing'));
+                }}
               >
-                <UserCheck />
-                <span className="nav-text">Investors</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <UserCheck size={18} />
+                  <span className="nav-text">Investors</span>
+                </div>
               </button>
             </li>
+
+
+
+            {/* Buffalo Tree */}
             <li>
               <button
-                className={`nav-item ${activeTab === 'tree' ? 'active' : ''}`}
-                onClick={() => dispatch(setActiveTab('tree'))}
-                title={!isSidebarOpen ? "Buffalo Tree" : ""}
+                className={`nav-item ${activeTab === 'tree' ? 'active-main' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('tree'));
+                }}
               >
-                <TreePine />
-                <span className="nav-text">Buffalo Tree</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <TreePine size={18} />
+                  <span className="nav-text">Buffalo Tree</span>
+                </div>
               </button>
             </li>
+
+            {/* Products */}
             <li>
               <button
-                className={`nav-item ${activeTab === 'products' ? 'active' : ''}`}
-                onClick={() => dispatch(setActiveTab('products'))}
-                title={!isSidebarOpen ? "Products" : ""}
+                className={`nav-item ${activeTab === 'products' ? 'active-main' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(setActiveTab('products'));
+                }}
               >
-                <ShoppingBag />
-                <span className="nav-text">Products</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                  <ShoppingBag size={18} />
+                  <span className="nav-text">Products</span>
+                </div>
               </button>
             </li>
           </ul>
 
           <div className="sidebar-footer">
-
-            <div className="user-profile" onClick={() => dispatch(setShowAdminDetails(true))} style={{ cursor: 'pointer' }}>
-              <div className="avatar-circle">{adminName.charAt(0)}</div>
-              <div className="user-info">
-                <span className="user-name">{adminName}</span>
-                <span className="user-email">{adminMobile}</span>
+            <button
+              className="nav-item logout"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLogout();
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <LogOut size={18} />
+                <span className="nav-text">Logout</span>
               </div>
-            </div>
-            <button className="logout-btn" onClick={onLogout} title={!isSidebarOpen ? "Logout" : ""}>
-              <LogOut size={18} />
-              <span className="nav-text">Logout</span>
             </button>
           </div>
         </nav>
 
         {/* Main Content Area */}
         <main className="main-content">
-          {/* Soft UI Header / Breadcrumbs */}
-
           <div className="tab-content">
-            {/* Content will be rendered here based on activeTab */}
             {activeTab === 'orders' && (
               <OrdersTab
                 handleApproveClick={handleApproveClick}
@@ -632,23 +691,21 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
               />
             )}
 
-
             {activeTab === 'tree' && <BuffaloTreeTab />}
 
             {activeTab === 'products' && <ProductsTab />}
-          </div >
-        </main >
 
-        {/* Floating + Icon at bottom left - only show on Referral tab */}
-        {
-          activeTab === 'nonVerified' && (
+            {activeTab === 'tracking' && <TrackingTab />}
+          </div>
+
+          {/* Floating + Icon at bottom left - only show on Referral tab */}
+          {activeTab === 'nonVerified' && (
             <button
               onClick={handleCreateClick}
               style={{
                 position: 'fixed',
                 bottom: '32px',
-                right: '32px', // Moved to right for better UX with sidebar
-                left: 'auto',
+                right: '32px',
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
@@ -668,31 +725,35 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
             >
               +
             </button>
-          )
-        }
-
-        <ReferralModal
-          formData={formData}
-          onInputChange={handleInputChange}
-          onBlur={handleReferralMobileBlur}
-          onSubmit={handleSubmit}
-        />
-
-        {/* Edit Modal */}
-        <EditReferralModal
-          editFormData={editFormData}
-          onInputChange={handleEditInputChange}
-          onBlur={handleEditReferralMobileBlur}
-          onSubmit={handleEditSubmit}
-        />
-
-
-
-        <ImageNamesModal />
-
-        <AdminDetailsModal />
-
+          )}
+        </main>
       </div>
+
+      <ReferralModal
+        formData={formData}
+        onInputChange={handleInputChange}
+        onBlur={handleReferralMobileBlur}
+        onSubmit={handleSubmit}
+      />
+
+      {/* Edit Modal */}
+      <EditReferralModal
+        editFormData={editFormData}
+        onInputChange={handleEditInputChange}
+        onBlur={handleEditReferralMobileBlur}
+        onSubmit={handleEditSubmit}
+      />
+
+      <ImageNamesModal />
+
+      <AdminDetailsModal
+        adminName={adminName}
+        adminMobile={adminMobile}
+        adminRole={adminRole}
+        lastLogin={lastLogin}
+        presentLogin={presentLogin}
+      />
+
     </div>
   );
 };

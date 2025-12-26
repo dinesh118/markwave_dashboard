@@ -3,12 +3,24 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import type { RootState } from '../../store';
 import { setShowAdminDetails } from '../../store/slices/uiSlice';
 
-interface AdminDetailsModalProps { }
+interface AdminDetailsModalProps {
+    adminName?: string;
+    adminMobile?: string;
+    adminRole?: string;
+    lastLogin?: string;
+    presentLogin?: string;
+}
 
-const AdminDetailsModal: React.FC<AdminDetailsModalProps> = () => {
+const AdminDetailsModal: React.FC<AdminDetailsModalProps> = (props) => {
     const dispatch = useAppDispatch();
     const isOpen = useAppSelector((state: RootState) => state.ui.showAdminDetails);
-    const { adminName, adminMobile, adminRole, lastLogin, presentLogin } = useAppSelector((state: RootState) => state.auth);
+    const auth = useAppSelector((state: RootState) => state.auth);
+
+    const adminName = props.adminName || auth.adminName;
+    const adminMobile = props.adminMobile || auth.adminMobile;
+    const adminRole = props.adminRole || auth.adminRole;
+    const lastLogin = props.lastLogin || auth.lastLogin;
+    const presentLogin = props.presentLogin || auth.presentLogin;
 
     const onClose = () => {
         dispatch(setShowAdminDetails(false));
@@ -21,12 +33,18 @@ const AdminDetailsModal: React.FC<AdminDetailsModalProps> = () => {
                 className="admin-popover"
                 onClick={(e) => e.stopPropagation()}
                 style={{
+                    position: 'absolute',
+                    top: '75px',
+                    right: '25px',
+                    left: 'auto',
+                    width: '320px',
                     background: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
                     border: '1px solid #e5e7eb',
                     zIndex: 2000,
-                    padding: '1.25rem'
+                    padding: '1.25rem',
+                    animation: 'fadeIn 0.2s ease-out'
                 }}
             >
                 <button

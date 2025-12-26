@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import type { RootState } from '../../store';
+import { CheckCircle, CheckSquare, XCircle, Clock, ClipboardList } from 'lucide-react';
 import {
     setSearchQuery,
     setPaymentFilter,
@@ -36,6 +37,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
         const tx = entry.transaction || {};
         const inv = entry.investor || {};
 
+
         let matchesSearch = true;
         if (searchQuery) {
             const query = searchQuery.toLocaleLowerCase();
@@ -54,11 +56,19 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
 
         let matchesStatus = true;
         if (statusFilter !== 'All Status') {
-            matchesStatus = unit.paymentStatus === statusFilter;
+            const currentStatus = unit.paymentStatus;
+            if (statusFilter === 'PAID') {
+                matchesStatus = currentStatus === 'PAID' || currentStatus === 'Approved';
+            } else if (statusFilter === 'REJECTED') {
+                matchesStatus = currentStatus === 'REJECTED' || currentStatus === 'Rejected';
+            } else {
+                matchesStatus = currentStatus === statusFilter;
+            }
         }
 
         return matchesSearch && matchesPayment && matchesStatus;
     });
+
 
     const handleViewProof = (transaction: any, investor: any) => {
         dispatch(setProofModal({ isOpen: true, data: { ...transaction, name: investor.name } }));
@@ -107,112 +117,103 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
         return val;
     };
 
+    // Calculate Counts
+    const counts = {
+        needsApproval: pendingUnits.filter((u: any) => u.order?.paymentStatus === 'PENDING_ADMIN_VERIFICATION').length,
+        approved: pendingUnits.filter((u: any) => u.order?.paymentStatus === 'Approved' || u.order?.paymentStatus === 'PAID').length,
+        rejected: pendingUnits.filter((u: any) => u.order?.paymentStatus === 'Rejected' || u.order?.paymentStatus === 'REJECTED').length,
+        notPaid: pendingUnits.filter((u: any) => u.order?.paymentStatus === 'PENDING_PAYMENT').length,
+    };
+
     return (
         <div className="orders-dashboard" style={{ marginTop: '-10px' }}>
-            <h2>Live Orders </h2>
-            {/* Stats Widgets */}
-            <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden', cursor: 'pointer' }} onClick={() => dispatch(setStatusFilter('PENDING_ADMIN_VERIFICATION'))}>
-                    <div>
-                        <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Pending Orders</p>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                {pendingUnits.filter((u: any) => u.order?.paymentStatus === 'PENDING_PAYMENT' || u.order?.paymentStatus === 'PENDING_ADMIN_VERIFICATION').length}
-                            </h5>
-                            <span style={{ color: '#82d616', fontWeight: 700, fontSize: '0.75rem' }}>+15%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={() => dispatch(setStatusFilter('PAID'))}>
-                    <div style={{ display: 'flex' }}>
-                        <div>
-                            <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Approved Orders</p>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                {pendingUnits.filter((u: any) => u.order?.paymentStatus === 'Approved' || u.order?.paymentStatus === 'PAID').length}
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={() => dispatch(setStatusFilter('REJECTED'))}>
-                    <div style={{ display: 'flex' }}>
-                        <div>
-                            <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Rejected Orders</p>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                {pendingUnits.filter((u: any) => u.order?.paymentStatus === 'Rejected' || u.order?.paymentStatus === 'REJECTED').length}
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={() => dispatch(setStatusFilter('All Status'))}>
-                    <div style={{ display: 'flex' }}>
-                        <div>
-                            <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Total Orders</p>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                {pendingUnits.length}
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)' }}>
-                    <div style={{ display: 'flex' }}>
-                        <div>
-                            <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Total Units</p>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                {pendingUnits.reduce((acc: number, curr: any) => acc + (curr.order?.numUnits || 0), 0)}
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div style={{ background: 'white', borderRadius: '1rem', padding: '1rem', boxShadow: '0 20px 27px 0 rgba(0,0,0,0.05)' }}>
-                    <div style={{ display: 'flex' }}>
-                        <div>
-                            <p style={{ color: '#67748e', fontSize: '0.8rem', fontWeight: 600, margin: '0 0 2px 0' }}>Total Amount</p>
-                            <h5 style={{ color: '#344767', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                                ₹{pendingUnits.reduce((acc: number, curr: any) => acc + (Number(curr.transaction?.amount) || 0), 0).toLocaleString()}
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="filter-controls" style={{ padding: '0.5rem 0', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <h2 style={{ margin: 0 }}>Live Orders</h2>
                 <input
                     type="text"
-                    placeholder="Search By User Name,Unit Id,User Mobile,Buffalo Id"
+                    placeholder="Search By UserName, OrderId, UserMobile"
                     className="search-input"
-                    style={{ width: '400px' }}
+                    style={{ width: '300px', padding: '6px 12px', fontSize: '0.9rem', height: 'auto' }}
                     value={searchQuery}
                     onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 />
-
-                <select
-                    className="filter-select h-5"
-                    value={paymentFilter}
-                    onChange={(e) => dispatch(setPaymentFilter(e.target.value))}
-                >
-                    <option value="All Payments">All Payments</option>
-                    <option value="BANK_TRANSFER">Bank Transfer</option>
-                    <option value="CHEQUE">Cheque</option>
-                    <option value="ONLINE_UPI">Online/UPI</option>
-                </select>
-
-                <select
-                    className="filter-select h-5"
-                    value={statusFilter}
-                    onChange={(e) => dispatch(setStatusFilter(e.target.value))}
-                >
-                    <option value="All Status">All Status</option>
-                    <option value="PENDING_ADMIN_VERIFICATION">Needs Approval</option>
-                    <option value="PENDING_PAYMENT">Not Paid(Draft)</option>
-                    <option value="PAID">Approved</option>
-                    <option value="REJECTED">Rejected</option>
-                </select>
             </div>
+
+            {/* New Filter Tabs */}
+            {/* Status Cards / Filters */}
+            <div className="status-controls">
+                <div
+                    className="stats-card"
+                    onClick={() => dispatch(setStatusFilter('PENDING_ADMIN_VERIFICATION'))}
+                    style={{ borderColor: statusFilter === 'PENDING_ADMIN_VERIFICATION' ? '#fcd34d' : 'transparent' }}
+                >
+                    <div className="card-icon-wrapper" style={{ backgroundColor: '#fffbeb', color: '#d97706' }}>
+                        <CheckCircle size={24} />
+                    </div>
+                    <div className="card-content">
+                        <h3>{counts.needsApproval}</h3>
+                        <p>Admin Approval</p>
+                    </div>
+                </div>
+
+                <div
+                    className="stats-card"
+                    onClick={() => dispatch(setStatusFilter('PAID'))}
+                    style={{ borderColor: statusFilter === 'PAID' ? '#6ee7b7' : 'transparent' }}
+                >
+                    <div className="card-icon-wrapper" style={{ backgroundColor: '#ecfdf5', color: '#059669' }}>
+                        <CheckSquare size={24} />
+                    </div>
+                    <div className="card-content">
+                        <h3>{counts.approved}</h3>
+                        <p>Approved</p>
+                    </div>
+                </div>
+
+                <div
+                    className="stats-card"
+                    onClick={() => dispatch(setStatusFilter('REJECTED'))}
+                    style={{ borderColor: statusFilter === 'REJECTED' ? '#fca5a5' : 'transparent' }}
+                >
+                    <div className="card-icon-wrapper" style={{ backgroundColor: '#fef2f2', color: '#dc2626' }}>
+                        <XCircle size={24} />
+                    </div>
+                    <div className="card-content">
+                        <h3>{counts.rejected}</h3>
+                        <p>Rejected</p>
+                    </div>
+                </div>
+
+                <div
+                    className="stats-card"
+                    onClick={() => dispatch(setStatusFilter('PENDING_PAYMENT'))}
+                    style={{ borderColor: statusFilter === 'PENDING_PAYMENT' ? '#cbd5e1' : 'transparent' }}
+                >
+                    <div className="card-icon-wrapper" style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
+                        <Clock size={24} />
+                    </div>
+                    <div className="card-content">
+                        <h3>{counts.notPaid}</h3>
+                        <p>Payment Due</p>
+                    </div>
+                </div>
+
+                <div
+                    className="stats-card"
+                    onClick={() => dispatch(setStatusFilter('All Status'))}
+                    style={{ borderColor: statusFilter === 'All Status' ? '#0ea5e9' : 'transparent' }}
+                >
+                    <div className="card-icon-wrapper" style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }}>
+                        <ClipboardList size={24} />
+                    </div>
+                    <div className="card-content">
+                        <h3>{pendingUnits.length}</h3>
+                        <p>Open Orders</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Filter Controls Removed (Search moved to header, Select moved to Table) */}
 
             {ordersError && (
                 <div style={{ marginBottom: '0.75rem', color: '#dc2626' }}>{ordersError}</div>
@@ -230,7 +231,30 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                             <th>User Mobile</th>
                             <th>Email</th>
                             <th>Amount</th>
-                            <th>Payment Type</th>
+                            <th>
+                                <select
+                                    value={paymentFilter}
+                                    onChange={(e) => dispatch(setPaymentFilter(e.target.value))}
+                                    style={{
+                                        background: '#ffffff',
+                                        color: '#344767',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '6px',
+                                        padding: '4px 8px',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        fontSize: '0.85rem',
+                                        width: '135px',
+                                        height: '35px'
+                                    }}
+                                >
+                                    <option value="All Payments">Payment Type</option>
+                                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                                    <option value="CHEQUE">Cheque</option>
+                                    <option value="ONLINE_UPI" disabled>Online/UPI</option>
+                                </select>
+                            </th>
                             <th style={{ minWidth: '200px' }}>Payment Image Proof</th>
                             <th>Actions</th>
                         </tr>
@@ -248,22 +272,45 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                                 const tx = entry.transaction || {};
                                 const inv = entry.investor || {};
                                 const isExpanded = expandedOrderId === unit.id;
-                                const canExpand = ['PAID', 'Approved'].includes(unit.paymentStatus);
+                                const canExpand = false;
 
                                 return (
-                                    <React.Fragment key={unit.id || index}>
+                                    <React.Fragment key={`${unit.id || 'order'}-${index}`}>
                                         <tr>
                                             <td>{index + 1}</td>
                                             <td>{inv.name}</td>
-                                            <td>
-                                                <span className={`status-badge ${(unit.paymentStatus === 'PENDING_ADMIN_VERIFICATION' || unit.paymentStatus === 'PENDING_PAYMENT') ? 'pending' :
-                                                    unit.paymentStatus === 'PAID' ? 'approved' :
-                                                        unit.paymentStatus === 'REJECTED' ? 'rejected' : ''
-                                                    }`}>
-                                                    {unit.paymentStatus === 'PENDING_ADMIN_VERIFICATION' ? 'PENDING_ADMIN_VERIFICATION' :
-                                                        unit.paymentStatus === 'PENDING_PAYMENT' ? 'PENDING_PAYMENT' :
-                                                            unit.paymentStatus || '-'}
-                                                </span>
+                                            <td style={{ verticalAlign: 'middle' }}>
+                                                {(() => {
+                                                    let statusValues = { label: unit.paymentStatus || '-', style: {} };
+
+                                                    if (unit.paymentStatus === 'PENDING_ADMIN_VERIFICATION') {
+                                                        statusValues = {
+                                                            label: 'Admin Approval',
+                                                            style: { border: '1px solid #fcd34d', background: '#fffbeb', color: '#b45309', borderRadius: '9999px', padding: '4px 12px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }
+                                                        };
+                                                    } else if (unit.paymentStatus === 'PAID' || unit.paymentStatus === 'Approved') {
+                                                        statusValues = {
+                                                            label: 'Paid',
+                                                            style: { border: '1px solid #34d399', background: '#ecfdf5', color: '#047857', borderRadius: '9999px', padding: '4px 12px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }
+                                                        };
+                                                    } else if (unit.paymentStatus === 'REJECTED') {
+                                                        statusValues = {
+                                                            label: 'Rejected',
+                                                            style: { border: '1px solid #fca5a5', background: '#fef2f2', color: '#b91c1c', borderRadius: '9999px', padding: '4px 12px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }
+                                                        };
+                                                    } else if (unit.paymentStatus === 'PENDING_PAYMENT') {
+                                                        statusValues = {
+                                                            label: 'Payment Due',
+                                                            style: { border: '1px solid #cbd5e1', background: '#f1f5f9', color: '#334155', borderRadius: '9999px', padding: '4px 12px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }
+                                                        };
+                                                    }
+
+                                                    return (
+                                                        <span style={{ display: 'inline-block', ...statusValues.style }}>
+                                                            {statusValues.label}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
                                             <td>{unit.numUnits}</td>
                                             <td>

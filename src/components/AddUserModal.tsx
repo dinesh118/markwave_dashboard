@@ -28,7 +28,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose, onSuccess 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.mobile || !formData.name) {
       setError('Please fill in all fields');
       return;
@@ -37,9 +37,9 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ isOpen, onClose, onSuccess 
     try {
       setLoading(true);
       setError(null);
-      
+
       const result = await userService.createUser(formData);
-      
+
       if (result.error) {
         setError(result.error);
       } else {
