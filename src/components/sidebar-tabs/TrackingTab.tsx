@@ -17,6 +17,7 @@ const TrackingTab: React.FC = () => {
     const { expandedOrderId, activeUnitIndex, showFullDetails } = expansion;
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [expandedTrackerKeys, setExpandedTrackerKeys] = useState<Record<string, boolean>>({});
     const itemsPerPage = 15;
 
     // Filter for PAID or Approved orders
@@ -127,7 +128,17 @@ const TrackingTab: React.FC = () => {
 
                                     return (
                                         <React.Fragment key={`${order.id}-${index}`}>
-                                            <tr className="tracking-table-row">
+                                            <tr className="tracking-table-row" onClick={() => {
+                                                if (isExpanded) {
+                                                    dispatch(setExpandedOrderId(null));
+                                                    dispatch(setActiveUnitIndex(null));
+                                                    dispatch(setShowFullDetails(false));
+                                                } else {
+                                                    dispatch(setExpandedOrderId(unit.id));
+                                                    dispatch(setActiveUnitIndex(0));
+                                                    dispatch(setShowFullDetails(false));
+                                                }
+                                            }}>
                                                 <td className="tracking-table-td">
                                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                                 </td>
@@ -140,17 +151,7 @@ const TrackingTab: React.FC = () => {
                                                 <td className="tracking-table-td-bold">{order.numUnits}</td>
                                                 <td className="tracking-table-td">
                                                     <button
-                                                        onClick={() => {
-                                                            if (isExpanded) {
-                                                                dispatch(setExpandedOrderId(null));
-                                                                dispatch(setActiveUnitIndex(null));
-                                                                dispatch(setShowFullDetails(false));
-                                                            } else {
-                                                                dispatch(setExpandedOrderId(unit.id));
-                                                                dispatch(setActiveUnitIndex(0));
-                                                                dispatch(setShowFullDetails(false));
-                                                            }
-                                                        }}
+
                                                         className="tracking-order-id-btn">
                                                         {order.id}
                                                     </button>
@@ -217,98 +218,119 @@ const TrackingTab: React.FC = () => {
                                                                 <div className="tracking-units-sidebar">
                                                                     <div className="tracking-units-title">Select Unit</div>
                                                                     <div className="units-sidebar tracking-units-list">
-                                                                        {Array.from({ length: unit.numUnits || 0 }).map((_, i) => (
-                                                                            <button
-                                                                                key={i}
-                                                                                onClick={() => dispatch(setActiveUnitIndex(activeUnitIndex === i ? null : i))}
-                                                                                className={`tracking-unit-btn ${activeUnitIndex === i ? 'active' : 'inactive'}`}
-                                                                            >
-                                                                                <span>Unit {i + 1}</span>
-                                                                                <span className="tracking-unit-btn-subtitle">{unit.breedId || 'MURRAH-001'}</span>
-                                                                            </button>
-                                                                        ))}
+                                                                        {Array.from({ length: Math.ceil(unit.numUnits || 0) }).map((_, i) => {
+                                                                            const unitBufCount = (i === Math.floor(unit.numUnits) && (unit.numUnits % 1 !== 0)) ? 1 : 2;
+                                                                            return (
+                                                                                <button
+                                                                                    key={i}
+                                                                                    onClick={() => dispatch(setActiveUnitIndex(activeUnitIndex === i ? null : i))}
+                                                                                    className={`tracking-unit-btn ${activeUnitIndex === i ? 'active' : 'inactive'}`}
+                                                                                >
+                                                                                    <span>Unit {i + 1} {unitBufCount === 1 && <span className="tracking-unit-buf-count">(1 Buffalo)</span>}</span>
+                                                                                    <span className="tracking-unit-btn-subtitle">{unit.breedId || 'MURRAH-001'}</span>
+                                                                                </button>
+                                                                            );
+                                                                        })}
                                                                     </div>
                                                                 </div>
 
                                                                 <div className="tracking-main-content">
                                                                     {activeUnitIndex !== null ? (
                                                                         <div className="order-expand-animation tracking-buffalo-grid">
-                                                                            {[1, 2].map((buffaloNum) => {
-                                                                                const tracker = trackingData[`${unit.id}-${buffaloNum}`] || getTrackingForBuffalo(unit.id, buffaloNum, unit.paymentStatus);
-                                                                                const currentStageId = tracker.currentStageId;
+                                                                            {(() => {
+                                                                                const numBuffaloes = (activeUnitIndex === Math.floor(unit.numUnits) && (unit.numUnits % 1 !== 0)) ? 1 : 2;
+                                                                                return Array.from({ length: numBuffaloes }).map((_, idx) => {
+                                                                                    const buffaloNum = idx + 1;
+                                                                                    const tracker = trackingData[`${unit.id}-${buffaloNum}`] || getTrackingForBuffalo(unit.id, buffaloNum, unit.paymentStatus);
+                                                                                    const currentStageId = tracker.currentStageId;
+                                                                                    const trackerKey = `${unit.id}-${buffaloNum}`;
+                                                                                    const isExpanded = !!expandedTrackerKeys[trackerKey];
 
-                                                                                const timelineStages = [
-                                                                                    { id: 1, label: 'Order Placed' },
-                                                                                    { id: 2, label: 'Payment Pending' },
-                                                                                    { id: 3, label: 'Order Confirm' },
-                                                                                    { id: 4, label: 'Order Approved' },
-                                                                                    { id: 5, label: 'Order in Market' },
-                                                                                    { id: 6, label: 'Order in Quarantine' },
-                                                                                    { id: 7, label: 'In Transit' },
-                                                                                    { id: 8, label: 'Order Delivered' }
-                                                                                ];
+                                                                                    const timelineStages = [
+                                                                                        { id: 1, label: 'Order Placed' },
+                                                                                        { id: 2, label: 'Payment Pending' },
+                                                                                        { id: 3, label: 'Order Confirm' },
+                                                                                        { id: 4, label: 'Order Approved' },
+                                                                                        { id: 5, label: 'Order in Market' },
+                                                                                        { id: 6, label: 'Order in Quarantine' },
+                                                                                        { id: 7, label: 'In Transit' },
+                                                                                        { id: 8, label: 'Order Delivered' }
+                                                                                    ];
 
-                                                                                return (
-                                                                                    <div key={buffaloNum} className="tracking-buffalo-card">
-                                                                                        <div className="tracking-buffalo-title">
-                                                                                            Buffalo {buffaloNum} Progress
-                                                                                        </div>
+                                                                                    return (
+                                                                                        <div key={buffaloNum} className="tracking-buffalo-card">
+                                                                                            <div className="tracking-buffalo-title">
+                                                                                                <span>cycle-{buffaloNum} </span>
+                                                                                                <button
+                                                                                                    onClick={() => setExpandedTrackerKeys(prev => ({ ...prev, [trackerKey]: !prev[trackerKey] }))}
+                                                                                                    className="tracking-individual-expand-btn"
+                                                                                                    style={{ backgroundColor: 'white', border: 'none' }}
+                                                                                                >
+                                                                                                    {isExpanded ? 'Minimize' : 'Expand'}
+                                                                                                    <span className={`tracking-chevron ${isExpanded ? 'up' : 'down'}`}>
+                                                                                                        {isExpanded ? '▲' : '▼'}
+                                                                                                    </span>
+                                                                                                </button>
+                                                                                            </div>
 
-                                                                                        <div className="tracking-timeline-container">
-                                                                                            {timelineStages.map((stage, idx) => {
-                                                                                                const isLast = idx === timelineStages.length - 1;
-                                                                                                const isStepCompleted = stage.id < currentStageId;
-                                                                                                const isCurrent = stage.id === currentStageId;
-                                                                                                const stageDate = tracker.history[stage.id]?.date || '-';
-                                                                                                const stageTime = tracker.history[stage.id]?.time || '-';
+                                                                                            {isExpanded && (
+                                                                                                <div className="tracking-timeline-container order-expand-animation">
+                                                                                                    {timelineStages.map((stage, idx) => {
+                                                                                                        const isLast = idx === timelineStages.length - 1;
+                                                                                                        const isStepCompleted = stage.id < currentStageId;
+                                                                                                        const isCurrent = stage.id === currentStageId;
+                                                                                                        const stageDate = tracker.history[stage.id]?.date || '-';
+                                                                                                        const stageTime = tracker.history[stage.id]?.time || '-';
 
-                                                                                                return (
-                                                                                                    <div key={stage.id} className="tracking-timeline-item">
-                                                                                                        <div className="tracking-timeline-date-col">
-                                                                                                            <div className="tracking-timeline-date">{stageDate}</div>
-                                                                                                        </div>
-
-                                                                                                        <div className="tracking-timeline-marker-col">
-                                                                                                            {!isLast && (
-                                                                                                                <div className={`tracking-timeline-line ${isStepCompleted ? 'completed' : 'pending'}`} />
-                                                                                                            )}
-                                                                                                            <div className={`tracking-timeline-dot ${isStepCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
-                                                                                                                {isStepCompleted ? '✓' : stage.id}
-                                                                                                            </div>
-                                                                                                        </div>
-
-                                                                                                        <div className={`tracking-timeline-content-col ${isLast ? 'last' : ''}`}>
-                                                                                                            <div className="tracking-timeline-header">
-                                                                                                                <div className={`tracking-timeline-label ${isStepCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
-                                                                                                                    {stage.label}
+                                                                                                        return (
+                                                                                                            <div key={stage.id} className="tracking-timeline-item">
+                                                                                                                <div className="tracking-timeline-date-col">
+                                                                                                                    <div className="tracking-timeline-date">{stageDate}</div>
                                                                                                                 </div>
 
-                                                                                                                {isCurrent && (
-                                                                                                                    <button
-                                                                                                                        className="tracking-update-btn"
-                                                                                                                        onClick={() => handleStageUpdateLocal(unit.id, buffaloNum, stage.id + 1)}
-                                                                                                                    >
-                                                                                                                        {stage.id === 8 ? 'Confirm Delivery' : 'Update'}
-                                                                                                                    </button>
-                                                                                                                )}
+                                                                                                                <div className="tracking-timeline-marker-col">
+                                                                                                                    {!isLast && (
+                                                                                                                        <div className={`tracking-timeline-line ${isStepCompleted ? 'completed' : 'pending'}`} />
+                                                                                                                    )}
+                                                                                                                    <div className={`tracking-timeline-dot ${isStepCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
+                                                                                                                        {isStepCompleted ? '✓' : stage.id}
+                                                                                                                    </div>
+                                                                                                                </div>
 
-                                                                                                                {isStepCompleted && (
-                                                                                                                    <span className="tracking-completed-badge">
-                                                                                                                        {stage.id === 8 ? 'Delivered' : 'Completed'}
-                                                                                                                    </span>
-                                                                                                                )}
+                                                                                                                <div className={`tracking-timeline-content-col ${isLast ? 'last' : ''}`}>
+                                                                                                                    <div className="tracking-timeline-header">
+                                                                                                                        <div className={`tracking-timeline-label ${isStepCompleted ? 'completed' : isCurrent ? 'current' : 'pending'}`}>
+                                                                                                                            {stage.label}
+                                                                                                                        </div>
+
+                                                                                                                        {isCurrent && (
+                                                                                                                            <button
+                                                                                                                                className="tracking-update-btn"
+                                                                                                                                onClick={() => handleStageUpdateLocal(unit.id, buffaloNum, stage.id + 1)}
+                                                                                                                            >
+                                                                                                                                {stage.id === 8 ? 'Confirm Delivery' : 'Update'}
+                                                                                                                            </button>
+                                                                                                                        )}
+
+                                                                                                                        {isStepCompleted && (
+                                                                                                                            <span className="tracking-completed-badge">
+                                                                                                                                {stage.id === 8 ? 'Delivered' : 'Completed'}
+                                                                                                                            </span>
+                                                                                                                        )}
+                                                                                                                    </div>
+                                                                                                                    <div className="tracking-timeline-time">
+                                                                                                                        {stageTime !== '-' ? stageTime : ''}
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div className="tracking-timeline-time">
-                                                                                                                {stageTime !== '-' ? stageTime : ''}
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                );
-                                                                                            })}
+                                                                                                        );
+                                                                                                    })}
+                                                                                                </div>
+                                                                                            )}
                                                                                         </div>
-                                                                                    </div>
-                                                                                );
-                                                                            })}
+                                                                                    );
+                                                                                });
+                                                                            })()}
                                                                         </div>
                                                                     ) : (
                                                                         <div className="tracking-no-selection-placeholder">

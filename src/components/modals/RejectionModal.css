@@ -1,0 +1,115 @@
+.rejection-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.rejection-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rejection-modal-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: scale(0.9);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rejection-modal-overlay.open .rejection-modal-card {
+    transform: scale(1);
+}
+
+.rejection-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a202c;
+    font-weight: 700;
+}
+
+.rejection-modal-header p {
+    margin: 8px 0 0;
+    color: #718096;
+    font-size: 0.95rem;
+}
+
+.rejection-modal-body {
+    margin-top: 24px;
+}
+
+.rejection-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 16px;
+    border: 2px solid #edf2f7;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+    background: white;
+}
+
+.rejection-textarea:focus {
+    outline: none;
+    border-color: #f56565;
+}
+
+.rejection-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.rejection-btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rejection-btn-cancel {
+    background: #edf2f7;
+    color: #4a5568;
+    border: none;
+}
+
+.rejection-btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+.rejection-btn-submit {
+    background: linear-gradient(135deg, #f56565 0%, #ed64a6 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(245, 101, 101, 0.2);
+}
+
+.rejection-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(245, 101, 101, 0.3);
+}
+
+.rejection-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}

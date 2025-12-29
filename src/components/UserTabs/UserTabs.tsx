@@ -13,6 +13,7 @@ import {
   setReferralModalOpen,
   setEditReferralModal,
   setProofModal,
+  setRejectionModal,
 } from '../../store/slices/uiSlice';
 import {
   fetchPendingUnits,
@@ -33,6 +34,7 @@ import ImageNamesModal from '../modals/ImageNamesModal';
 import AdminDetailsModal from '../modals/AdminDetailsModal';
 import ReferralModal from '../modals/ReferralModal';
 import EditReferralModal from '../modals/EditReferralModal';
+import RejectionModal from '../modals/RejectionModal';
 
 // Lazy Load Tabs
 const OrdersTab = React.lazy(() => import('../sidebar-tabs/OrdersTab'));
@@ -122,15 +124,8 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
       alert('Failed to approve order.');
     }
   };
-  const handleReject = async (unitId: string) => {
-    if (!window.confirm('Are you sure you want to reject this order?')) return;
-    try {
-      await dispatch(rejectOrder({ unitId, adminMobile })).unwrap();
-      alert('Order rejected successfully!');
-    } catch (error) {
-      console.error('Error rejecting order:', error);
-      alert('Failed to reject order.');
-    }
+  const handleReject = (unitId: string) => {
+    dispatch(setRejectionModal({ isOpen: true, unitId }));
   };
 
   const handleCreateClick = () => {
@@ -618,6 +613,8 @@ const UserTabs: React.FC<UserTabsProps> = ({ adminMobile, adminName, adminRole, 
         lastLogin={lastLogin}
         presentLogin={presentLogin}
       />
+
+      <RejectionModal />
 
     </div >
   );

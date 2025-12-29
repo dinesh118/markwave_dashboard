@@ -51,9 +51,9 @@ export const approveOrder = createAsyncThunk(
 
 export const rejectOrder = createAsyncThunk(
     'orders/rejectOrder',
-    async ({ unitId, adminMobile }: { unitId: string; adminMobile: string }, { dispatch, rejectWithValue }) => {
+    async ({ unitId, adminMobile, reason }: { unitId: string; adminMobile: string; reason: string }, { dispatch, rejectWithValue }) => {
         try {
-            await axios.post(API_ENDPOINTS.rejectUnit(), { orderId: unitId }, {
+            await axios.post(API_ENDPOINTS.rejectUnit(), { orderId: unitId, reason }, {
                 headers: { 'X-Admin-Mobile': adminMobile }
             });
             // Refresh list after success

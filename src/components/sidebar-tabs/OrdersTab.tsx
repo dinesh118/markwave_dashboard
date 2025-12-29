@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import type { RootState } from '../../store';
-import { CheckCircle, CheckSquare, XCircle, Clock, ClipboardList } from 'lucide-react';
+import { CheckCircle, CheckSquare, XCircle, Clock, ClipboardList, ChevronDown } from 'lucide-react';
 import {
     setSearchQuery,
     setPaymentFilter,
@@ -52,7 +52,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
     const filteredUnits = useMemo(() => {
         return pendingUnits.filter((entry: any) => {
             const unit = entry.order || {};
-            const tx = entry.transaction || {};
+            const tx = entry.transaction || entry.transation || {};
             const inv = entry.investor || {};
 
             let matchesSearch = true;
@@ -290,7 +290,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                         ) : (
                             currentItems.map((entry: any, index: number) => {
                                 const unit = entry.order || {};
-                                const tx = entry.transaction || {};
+                                const tx = entry.transaction || entry.transation || {};
                                 const inv = entry.investor || {};
                                 const isExpanded = expandedOrderId === unit.id;
                                 const canExpand = false;
@@ -350,7 +350,63 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                                             <td>{inv.mobile}</td>
                                             <td>{inv.email || '-'}</td>
                                             <td>{tx.amount ?? '-'}</td>
-                                            <td>{tx.paymentType || '-'}</td>
+                                            <td className="payment-type-cell">
+                                                {tx.paymentType === 'BANK_TRANSFER' || tx.paymentType === 'CHEQUE' ? (
+                                                    <div className="bank-transfer-hover-container">
+                                                        <span>{tx.paymentType === 'BANK_TRANSFER' ? 'Bank Transfer' : 'Cheque'}</span>
+                                                        <div className="bank-details-tooltip">
+                                                            <div className="tooltip-title">Payment Details</div>
+                                                            {(() => {
+                                                                const findVal = (obj: any, keys: string[], partials: string[]) => {
+                                                                    if (!obj) return '-';
+                                                                    for (const k of keys) {
+                                                                        if (obj[k]) return obj[k];
+                                                                    }
+                                                                    const foundKey = Object.keys(obj).find(k =>
+                                                                        partials.some(p => k.toLowerCase().includes(p))
+                                                                    );
+                                                                    return foundKey ? obj[foundKey] : '-';
+                                                                };
+
+                                                                const isCheque = tx.paymentType === 'CHEQUE';
+
+                                                                return (
+                                                                    <>
+                                                                        <div className="tooltip-item">
+                                                                            <span className="tooltip-label">Bank Name:</span>
+                                                                            <span className="tooltip-value">{findVal(tx, ['bank_name', 'bankName', 'bank_details'], ['bank'])}</span>
+                                                                        </div>
+                                                                        <div className="tooltip-item">
+                                                                            <span className="tooltip-label">{isCheque ? 'Cheque No:' : 'A/C Number:'}</span>
+                                                                            <span className="tooltip-value">
+                                                                                {isCheque
+                                                                                    ? findVal(tx, ['cheque_no', 'cheque_number', 'chequeNo'], ['cheque'])
+                                                                                    : findVal(tx, ['account_number', 'account_no', 'acc_no', 'ac_no', 'accountNumber'], ['account', 'acc_no', 'ac_no'])
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="tooltip-item">
+                                                                            <span className="tooltip-label">{isCheque ? 'Cheque Date:' : 'UTR:'}</span>
+                                                                            <span className="tooltip-value">
+                                                                                {isCheque
+                                                                                    ? findVal(tx, ['cheque_date', 'date'], ['date'])
+                                                                                    : findVal(tx, ['utr', 'utr_no', 'utr_number', 'transaction_id'], ['utr', 'txid'])
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="tooltip-item">
+                                                                            <span className="tooltip-label">IFSC:</span>
+                                                                            <span className="tooltip-value">{findVal(tx, ['ifsc_code', 'ifsc', 'ifscCode'], ['ifsc'])}</span>
+                                                                        </div>
+                                                                    </>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    tx.paymentType || '-'
+                                                )}
+                                            </td>
                                             <td>
                                                 {unit.paymentType ? (
                                                     <button
@@ -394,8 +450,8 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                                                                             { label: 'Payment Method', value: tx.paymentType || '-' },
                                                                             { label: 'Total Amount', value: `₹${tx.amount ?? '-'}` },
                                                                             { label: 'Approval Date', value: formatIndiaDateHeader(unit.updatedAt || unit.updated_at || unit.createdAt || unit.created_at || tx.updatedAt || tx.updated_at || tx.createdAt || tx.created_at || unit.paymentApprovedAt || tx.receipt_date || unit.date || tx.date || unit.approved_at || unit.approvedAt || tx.approved_at || tx.approvedAt || unit.order_date || tx.payment_date) },
-                                                                            { label: 'Payment Mode', value: tx.paymentType || 'MANUAL_PAYMENT' },
-                                                                            { label: 'Breed ID', value: unit.breedId || 'MURRAH-001' }
+                                                                            // { label: 'Payment Mode', value: tx.paymentType || 'MANUAL_PAYMENT' },
+                                                                            { label: 'Breed ID', value: unit.breedId }
                                                                         ].map((item, idx) => (
                                                                             <div key={idx} className="details-item">
                                                                                 <div className="details-label">{item.label}</div>
@@ -407,7 +463,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                                                                         onClick={() => dispatch(setShowFullDetails(!showFullDetails))}
                                                                         className={`toggle-details-btn ${showFullDetails ? 'open' : 'closed'}`}
                                                                     >
-                                                                        ∨
+                                                                        suiru
                                                                     </button>
                                                                 </div>
 
@@ -477,7 +533,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
                                                                             return (
                                                                                 <div key={buffaloNum} className="tracking-card">
                                                                                     <div className="tracking-card-header">
-                                                                                        Buffalo {buffaloNum} Progress
+                                                                                        Cycle-{buffaloNum}
                                                                                     </div>
 
                                                                                     <div className="timeline-container">

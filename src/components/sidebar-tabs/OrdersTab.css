@@ -150,6 +150,87 @@
     height: 35px;
 }
 
+/* Payment Type Hover Details */
+.payment-type-cell {
+    position: relative;
+}
+
+.bank-transfer-hover-container {
+    cursor: pointer;
+    color: #2563eb;
+    font-weight: 600;
+    position: relative;
+    display: inline-block;
+}
+
+.bank-details-tooltip {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 15px);
+    transform: translateY(-50%);
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    width: 280px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.bank-details-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent #ffffff transparent transparent;
+}
+
+.bank-transfer-hover-container:hover .bank-details-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tooltip-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.tooltip-item:last-child {
+    margin-bottom: 0;
+}
+
+.tooltip-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.tooltip-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e293b;
+    text-align: right;
+    word-break: break-all;
+}
+
 
 
 .action-btn-container {

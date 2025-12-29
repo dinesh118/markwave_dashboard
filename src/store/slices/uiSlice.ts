@@ -14,6 +14,10 @@ export interface UIState {
             isOpen: boolean;
             data: any;
         };
+        rejection: {
+            isOpen: boolean;
+            unitId: string | null;
+        };
     };
 }
 
@@ -30,6 +34,10 @@ const initialState: UIState = {
         proof: {
             isOpen: false,
             data: null,
+        },
+        rejection: {
+            isOpen: false,
+            unitId: null,
         },
     },
 };
@@ -65,6 +73,12 @@ const uiSlice = createSlice({
                 state.modals.proof.data = action.payload.data;
             }
         },
+        setRejectionModal: (state, action: PayloadAction<{ isOpen: boolean; unitId?: string | null }>) => {
+            state.modals.rejection.isOpen = action.payload.isOpen;
+            if (action.payload.unitId !== undefined) {
+                state.modals.rejection.unitId = action.payload.unitId;
+            }
+        },
     },
 });
 
@@ -76,6 +90,7 @@ export const {
     setReferralModalOpen,
     setEditReferralModal,
     setProofModal,
+    setRejectionModal,
 } = uiSlice.actions;
 
 export const uiReducer = uiSlice.reducer;
