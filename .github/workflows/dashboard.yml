@@ -37,10 +37,10 @@ jobs:
         run: |
           if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then
             echo "DOCKER_USERNAME secret is EMPTY"
-             exit 1
-         else
+            exit 1
+          else
             echo "DOCKER_USERNAME secret is SET"
-         fi
+          fi
 
 
       - name: Build and Push Docker image
